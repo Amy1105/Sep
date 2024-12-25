@@ -11,6 +11,7 @@
     <DebugSymbols>true</DebugSymbols>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <IsPackable>false</IsPackable>
+    <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
   </PropertyGroup>
   
   <ItemGroup>

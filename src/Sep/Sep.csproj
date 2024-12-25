@@ -33,6 +33,8 @@
 
     <ContinuousIntegrationBuild Condition="'$(TF_BUILD)' == 'true'">true</ContinuousIntegrationBuild>
     <ContinuousIntegrationBuild Condition="'$(GITHUB_ACTIONS)' == 'true'">true</ContinuousIntegrationBuild>
+    <TargetFrameworks>net8.0;net7.0</TargetFrameworks>
+    <LangVersion>preview</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
