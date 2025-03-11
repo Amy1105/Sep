@@ -110,7 +110,7 @@ public class SepReaderState : IDisposable
 
     internal void SwapParsedRowsTo(SepReaderState other)
     {
-        A.Assert(_parsedRowIndex == 0);
+        A.Assert((_rowIndex == 0 && _hasHeader && _parsedRowIndex == 1) || _parsedRowIndex == 0);
         A.Assert(_parsedRowIndex <= _parsedRowsCount);
 
         other._parsedRowIndex = _parsedRowIndex;
@@ -198,11 +198,6 @@ public class SepReaderState : IDisposable
     void ThrowInvalidDataExceptionColCountMismatch(int colCountExpected)
     {
         var (rowStart, rowEnd) = RowStartEnd();
-        ThrowInvalidDataExceptionColCountMismatch(colCountExpected, rowStart, rowEnd);
-    }
-    [MethodImpl(MethodImplOptions.NoInlining)]
-    void ThrowInvalidDataExceptionColCountMismatch(int colCountExpected, int rowStart, int rowEnd)
-    {
         AssertState(rowStart, rowEnd);
         var row = new string(_chars, rowStart, rowEnd - rowStart);
         SepThrow.InvalidDataException_ColCountMismatch(_currentRowColCount, _rowIndex, _currentRowLineNumberFrom, _currentRowLineNumberTo, row,
@@ -615,7 +610,7 @@ public class SepReaderState : IDisposable
         }
     }
 
-    internal Span<T> Select<T>(ReadOnlySpan<int> colIndices, ColFunc<T> selector)
+    internal Span<T> ColsSelect<T>(ReadOnlySpan<int> colIndices, ColFunc<T> selector)
     {
         ArgumentNullException.ThrowIfNull(selector);
         var length = colIndices.Length;
@@ -627,7 +622,7 @@ public class SepReaderState : IDisposable
         return span;
     }
 
-    internal unsafe Span<T> Select<T>(ReadOnlySpan<int> colIndices, delegate*<Col, T> selector)
+    internal unsafe Span<T> ColsSelect<T>(ReadOnlySpan<int> colIndices, delegate*<Col, T> selector)
     {
         var length = colIndices.Length;
         var span = _arrayPool.RentUniqueArrayAsSpan<T>(length);
@@ -707,7 +702,7 @@ public class SepReaderState : IDisposable
         }
     }
 
-    internal Span<T> Select<T>(int colStart, int colCount, ColFunc<T> selector)
+    internal Span<T> ColsSelect<T>(int colStart, int colCount, ColFunc<T> selector)
     {
         ArgumentNullException.ThrowIfNull(selector);
         var span = _arrayPool.RentUniqueArrayAsSpan<T>(colCount);
@@ -718,7 +713,7 @@ public class SepReaderState : IDisposable
         return span;
     }
 
-    internal unsafe Span<T> Select<T>(int colStart, int colCount, delegate*<Col, T> selector)
+    internal unsafe Span<T> ColsSelect<T>(int colStart, int colCount, delegate*<Col, T> selector)
     {
         var span = _arrayPool.RentUniqueArrayAsSpan<T>(colCount);
         for (var i = 0; i < span.Length; i++)
